@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button onclick="window.location.href='index.html'">← Back to Categories</button>
+    <h1 id="categoryTitle"></h1>
+    <div id="currentDate" style="text-align:center; font-size:1.2em; margin-bottom:16px;"></div>
+
+    <h2>Daily Tasks</h2>
+    <button id="addDailyTaskBtn">Add Daily Task</button>
+    <ul id="dailyTaskList"></ul>
+
+    <h2>Overall Tasks</h2>
+    <button id="addOverallTaskBtn">Add Overall Task</button>
+    <ul id="overallTaskList"></ul>
+
+    <h3>Notes</h3>
+    <textarea id="notesArea" placeholder="Write your notes here..."></textarea>
+
+    <script src="script.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryName = urlParams.get("category");
+
+        document.getElementById("categoryTitle").innerText = categoryName + " Tasks";
+
+        let lastDate = null;
+        function updateDateAndResetTasks() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const todayStr = now.toLocaleDateString(undefined, options);
+            document.getElementById("currentDate").innerText = todayStr;
+            if (lastDate !== todayStr) {
+                // Reset daily tasks
+                let data = getData();
+                if (data[categoryName] && Array.isArray(data[categoryName].dailyTasks)) {
+                    data[categoryName].dailyTasks.forEach(task => task.done = false);
+                    saveData(data);
+                    loadCategoryData(categoryName);
+                }
+                lastDate = todayStr;
+            }
+        }
+        updateDateAndResetTasks();
+        // Check every minute for date change
+        setInterval(() => {
+            updateDateAndResetTasks();
+        }, 60 * 1000);
+
+        loadCategoryData(categoryName);
+
+        document.getElementById("addDailyTaskBtn").addEventListener("click", function(e) {
+            const task = prompt("Enter Task name:");
+            if (task) {
+                addTask(categoryName, task, "daily");
+                loadCategoryData(categoryName);
+            }
+        });
+
+        document.getElementById("addOverallTaskBtn").addEventListener("click", function(e) {
+            const task = prompt("Enter Overall Task name:");
+            if (task) {
+                addTask(categoryName, task, "overall");
+                loadCategoryData(categoryName);
+            }
+        });
+
+        document.getElementById("notesArea").addEventListener("input", (e) => {
+            saveNotes(categoryName, e.target.value);
+        });
+
+        // Color picker logic
+        function renderColorOptions(selectedColor) {
+            const colors = ["#FFB6C1", "#FFD700", "#90EE90", "#87CEFA", "#FFA07A", "#D3D3D3", "#E6E6FA", "#FF69B4", "#20B2AA", "#FFA500"];
+            const colorOptions = document.getElementById("colorOptions");
+            colorOptions.innerHTML = "";
+            colors.forEach(color => {
+                const colorDiv = document.createElement("div");
+                colorDiv.className = "color-option" + (color === selectedColor ? " selected" : "");
+                colorDiv.style.background = color;
+                colorDiv.onclick = function() {
+                    setCategoryColor(categoryName, color);
+                };
+                colorOptions.appendChild(colorDiv);
+            });
+        }
+        function setCategoryColor(category, color) {
+            let colors = JSON.parse(localStorage.getItem('categoryColors')) || {};
+            colors[category] = color;
+            localStorage.setItem('categoryColors', JSON.stringify(colors));
+            renderColorOptions(color);
+        }
+        // On page load, render color options
+        let colors = JSON.parse(localStorage.getItem('categoryColors')) || {};
+        let selectedColor = colors[categoryName] || null;
+        renderColorOptions(selectedColor);
+    </script>
+</body>
+</html>
+
