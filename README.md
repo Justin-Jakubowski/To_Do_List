@@ -14,14 +14,15 @@
 
 ## 📸 Screenshots  
 
-### Main To-Do List  
-  
+### Home Page
+
+![Home Page](Screenshots/Index.png)  
 
 ### Categories Page  
-
+![Categories Page](Screenshots/Category.png)
 
 ### Daily Log  
-
+![Daily Log](Screenshots/DailyLog.png)
 
 ---
 
@@ -30,7 +31,7 @@
 ```
 
 To\_Do\_List/
-│── index.html        # Main To-Do List interface
+│── index.html        # Home page interface
 │── category.html     # Manage categories
 │── dailyLog.html     # View daily logs
 │── script.js         # Application logic
