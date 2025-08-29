@@ -37,7 +37,7 @@ To\_Do\_List/
 │── script.js         # Application logic
 │── style.css         # Stylesheet
 └── assets/
-└── screenshots/  # Place screenshots here
+└── Screenshots/  # Place screenshots here
 
 ````
 
@@ -68,9 +68,3 @@ This project is licensed under the **MIT License**.
 
 ---
 
-```
-
----
-
-Do you want me to also **design sample screenshots/mockups** (like a clean to-do list UI preview) so your README looks professional even before you take real screenshots?
-```
