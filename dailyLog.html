@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Log</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button onclick="window.location.href='index.html'">← Back to To-Do List</button>
+    <h1 style="text-align:center;">Daily Accomplishments Log</h1>
+    <div style="display:flex;">
+      <main style="flex:1;">
+        <div id="logContainer" style="max-width:600px; margin:32px auto;"></div>
+      </main>
+      <aside style="width:220px; min-width:180px; padding:16px 8px 16px 0;">
+        <h3 style="margin-top:0;">Category Color</h3>
+        <label for="categoryColorSelect">Select Category:</label>
+        <select id="categoryColorSelect" style="width:100%; margin-bottom:12px;"></select>
+        <div id="colorOptions" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;"></div>
+        <div id="colorSaveMsg" style="font-size:0.95em; color:green;"></div>
+      </aside>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        // Color options (15 distinct colors)
+        const COLOR_PALETTE = [
+          '#FFB6C1','#FF69B4','#FFD700','#FFA500','#FF8C00','#ADFF2F','#32CD32','#00FA9A','#00CED1','#1E90FF','#4169E1','#8A2BE2','#FF6347','#A0522D','#708090'
+        ];
+
+        // Get all categories from todoData
+        function getAllCategories() {
+          const data = JSON.parse(localStorage.getItem('todoData')) || {};
+          return Object.keys(data);
+        }
+
+        // Get category colors from localStorage
+        function getCategoryColors() {
+          return JSON.parse(localStorage.getItem('categoryColors')) || {};
+        }
+
+        // Save category color to localStorage
+        function setCategoryColor(category, color) {
+          const colors = getCategoryColors();
+          colors[category] = color;
+          localStorage.setItem('categoryColors', JSON.stringify(colors));
+        }
+
+        // Render category dropdown and color options
+        function renderColorSidebar() {
+          const select = document.getElementById('categoryColorSelect');
+          const colorOptions = document.getElementById('colorOptions');
+          const saveMsg = document.getElementById('colorSaveMsg');
+          // Save current selection before rebuilding dropdown
+          const prevSelected = select.value;
+          select.innerHTML = '';
+          const categories = getAllCategories();
+          categories.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat;
+            opt.textContent = cat;
+            select.appendChild(opt);
+          });
+          // Restore previous selection if possible
+          if (categories.includes(prevSelected)) {
+            select.value = prevSelected;
+          } else if (categories.length > 0) {
+            select.value = categories[0];
+          }
+          colorOptions.innerHTML = '';
+          const selectedCat = select.value;
+          const categoryColors = getCategoryColors();
+          const selectedColor = categoryColors[selectedCat] || null;
+          COLOR_PALETTE.forEach(color => {
+            const btn = document.createElement('button');
+            btn.style.background = color;
+            btn.style.width = '28px';
+            btn.style.height = '28px';
+            btn.style.borderRadius = '50%';
+            btn.style.cursor = 'pointer';
+            btn.title = color;
+            if (color === selectedColor) {
+              btn.style.border = '3px solid #000';
+              btn.style.boxShadow = '0 0 8px 2px rgba(0,0,0,0.25)';
+              btn.style.outline = '2px solid #fff';
+            } else {
+              btn.style.border = '2px solid #ccc';
+              btn.style.boxShadow = 'none';
+              btn.style.outline = 'none';
+            }
+            btn.onclick = function() {
+              const cat = select.value;
+              setCategoryColor(cat, color);
+              saveMsg.textContent = `Color set for "${cat}"!`;
+              setTimeout(() => saveMsg.textContent = '', 1200);
+              renderLogs();
+              renderColorSidebar();
+            };
+            colorOptions.appendChild(btn);
+          });
+          // Remove previous onchange to avoid stacking
+          select.onchange = null;
+          select.addEventListener('change', function() {
+            renderColorSidebar();
+          });
+        }
+
+        // Call sidebar render on load
+        renderColorSidebar();
+        // Helper to format date
+        function formatDate(dateStr) {
+            // Parse date string as local date (not UTC)
+            const parts = dateStr.split('-');
+            // month is 0-based in JS Date
+            const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // Get all logs from localStorage
+        function getAllLogs() {
+            let logs = JSON.parse(localStorage.getItem('accomplishmentLogs')) || {};
+            return logs;
+        }
+
+        // Render logs for all dates
+        function renderLogs() {
+            const logs = getAllLogs();
+            const container = document.getElementById('logContainer');
+            container.innerHTML = '';
+            const dates = Object.keys(logs).sort((a,b) => new Date(b) - new Date(a));
+            if (dates.length === 0) {
+                container.innerHTML = '<p>No accomplishments logged yet.</p>';
+                return;
+            }
+            const categoryColors = getCategoryColors();
+            dates.forEach(date => {
+                const dayLog = logs[date];
+                const section = document.createElement('section');
+                section.innerHTML = `<h2 style='margin-bottom:8px;'>${formatDate(date)}</h2>`;
+                const ul = document.createElement('ul');
+                dayLog.forEach((item, idx) => {
+                    const li = document.createElement('li');
+                    let text, cat, color;
+                    if (typeof item === 'object' && item !== null) {
+                        text = item.text;
+                        cat = item.category;
+                        color = item.color;
+                    } else {
+                        text = item;
+                        // Try to extract category from legacy string
+                        let match = item.match(/^([^(]+) \((Daily|Overall)\): (.+)$/);
+                        if (match) {
+                            cat = match[1].trim();
+                        }
+                    }
+                    // Set background color for the task box
+                    if (color) {
+                        li.style.background = color;
+                    } else if (cat && categoryColors[cat]) {
+                        li.style.background = categoryColors[cat];
+                    }
+                    // Text span
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = text;
+                    li.appendChild(textSpan);
+                    // Actions container
+                    const actionsSpan = document.createElement('span');
+                    actionsSpan.style.marginLeft = '12px';
+                    // Edit button
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = 'Edit';
+                    editBtn.style.marginLeft = '0px';
+                    editBtn.onclick = function() {
+                        const logs = getAllLogs();
+                        const newText = prompt('Edit accomplishment:', text);
+                        if (newText !== null && newText.trim() !== '') {
+                            if (typeof logs[date][idx] === 'object') {
+                                logs[date][idx].text = newText.trim();
+                            } else {
+                                logs[date][idx] = newText.trim();
+                            }
+                            localStorage.setItem('accomplishmentLogs', JSON.stringify(logs));
+                            renderLogs();
+                        }
+                    };
+                    actionsSpan.appendChild(editBtn);
+                    // Delete button
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.style.marginLeft = '8px';
+                    deleteBtn.onclick = function() {
+                        const logs = getAllLogs();
+                        logs[date].splice(idx, 1);
+                        localStorage.setItem('accomplishmentLogs', JSON.stringify(logs));
+                        renderLogs();
+                    };
+                    actionsSpan.appendChild(deleteBtn);
+                    // Change date button
+                    const changeBtn = document.createElement('button');
+                    changeBtn.textContent = 'Change Date';
+                    changeBtn.style.marginLeft = '8px';
+                    changeBtn.onclick = function() {
+                        const newDate = prompt('Enter new date (YYYY-MM-DD):', date);
+                        if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+                            let logs = getAllLogs();
+                            // Remove from current date
+                            logs[date].splice(idx, 1);
+                            // Add to new date
+                            if (!logs[newDate]) logs[newDate] = [];
+                            logs[newDate].push(item);
+                            localStorage.setItem('accomplishmentLogs', JSON.stringify(logs));
+                            renderLogs();
+                        } else if (newDate) {
+                            alert('Invalid date format. Use YYYY-MM-DD.');
+                        }
+                    };
+                    actionsSpan.appendChild(changeBtn);
+                    li.appendChild(actionsSpan);
+                    ul.appendChild(li);
+                });
+                section.appendChild(ul);
+                container.appendChild(section);
+            });
+        }
+
+        renderLogs();
+    </script>
+</body>
+</html>

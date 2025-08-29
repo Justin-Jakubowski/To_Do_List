@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My To-Do Categories</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>My To-Do List</h1>
+
+    <div id="category-container"></div>
+    <button id="addCategoryBtn">+ Add Category</button>
+    <button id="deleteCategoryBtn">- Delete Category</button>
+    <button id="dailyLogBtn">📅 Daily Log</button>
+    <div style="display:flex; justify-content:center; margin-bottom:24px;">
+        <iframe src="https://calendar.google.com/calendar/embed?src=jakskidawg%40gmail.com&src=lu1g3apmca12568abl51e4vb48kbrg1h%40import.calendar.google.com&src=vkdujife2bgno1nf65kssdfru4%40group.calendar.google.com&ctz=America%2FNew_York" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+    </div>
+
+    <!-- Daily Log Modal -->
+    <div id="dailyLogModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:white; padding:32px; border-radius:12px; max-width:400px; margin:auto;">
+            <h2 style="margin-top:0;">Today's Accomplishments</h2>
+            <ul id="dailyLogList"></ul>
+            <button onclick="document.getElementById('dailyLogModal').style.display='none'">Close</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        loadCategories();
+
+        document.getElementById("addCategoryBtn").addEventListener("click", () => {
+            const name = prompt("Enter category name:");
+            if (name) {
+                addCategory(name);
+                loadCategories();
+            }
+        });
+
+        document.getElementById("deleteCategoryBtn").addEventListener("click", () => {
+            const delName = prompt("Enter category name to delete:");
+            if (delName) {
+                deleteCategory(delName);
+                loadCategories();
+            }
+        });
+
+        document.getElementById("dailyLogBtn").addEventListener("click", () => {
+            window.location.href = "dailyLog.html";
+        });
+    </script>
+</body>
+</html>
