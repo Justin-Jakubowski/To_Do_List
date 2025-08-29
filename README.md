@@ -16,13 +16,13 @@
 
 ### Home Page
 
-![Home Page](Screenshots/Index.png)  
+![Home Page](screenshots/Index.png)  
 
 ### Categories Page  
-![Categories Page](Screenshots/Category.png)
+![Categories Page](screenshots/Category.png)
 
 ### Daily Log  
-![Daily Log](Screenshots/DailyLog.png)
+![Daily Log](screenshots/DailyLog.png)
 
 ---
 
@@ -37,7 +37,7 @@ To\_Do\_List/
 │── script.js         # Application logic
 │── style.css         # Stylesheet
 └── assets/
-└── Screenshots/  # Place screenshots here
+└── screenshots/  # Place screenshots here
 
 ````
 
