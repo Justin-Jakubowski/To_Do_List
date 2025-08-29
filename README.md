@@ -16,13 +16,13 @@
 
 ### Home Page
 
-![Home Page](screenshots/Index.png)  
+![Home Page](screenshots/index.png)  
 
 ### Categories Page  
-![Categories Page](screenshots/Category.png)
+![Categories Page](screenshots/category.png)
 
 ### Daily Log  
-![Daily Log](screenshots/DailyLog.png)
+![Daily Log](screenshots/dailyLog.png)
 
 ---
 
@@ -47,7 +47,7 @@ To\_Do\_List/
 
 1. **Clone the repository**  
    ```bash
-   git clone https://github.com/yourusername/o_Do_List.git
+   git clone https://github.com/yourusername/To_Do_List.git
 ````
 
 2. **Open in browser**
