@@ -1,5 +1,5 @@
 
-# 📝 To_Do_List  
+# 📝 Event Calendar Planner
 *A simple web-based To-Do List application to help you organize tasks and categories.*
 
 ---
